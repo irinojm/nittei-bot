@@ -1,0 +1,200 @@
+body {
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 20px;
+}
+.container {
+    max-width: 700px;
+    margin: 20px auto;
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+h1 {
+    text-align: center;
+    color: #333;
+    border-bottom: 2px solid #00B900;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+}
+h2 {
+    color: #333;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+.input-group {
+    margin-bottom: 30px;
+}
+button {
+    display: block;
+    width: 100%;
+    background-color: #00B900;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+button:hover {
+    background-color: #009a00;
+}
+.description {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: -5px;
+    margin-bottom: 15px;
+}
+.flex-container, .inline-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.preset-container {
+    display: flex;
+    gap: 20px;
+}
+.preset-box {
+    flex: 1;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+.preset-box select, #deadline-hour, #deadline-minute {
+    width: auto;
+    flex-grow: 1;
+}
+#member-count {
+    width: 120px;
+}
+.reminder-option {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+}
+.reminder-option input[type="checkbox"] { margin-right: 8px; cursor: pointer; }
+.reminder-option label { font-size: 0.95em; color: #555; cursor: pointer; }
+
+#reminder-days-container {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #e6f7ff;
+    border: 1px solid #91d5ff;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+#reminder-days-container.hidden {
+    opacity: 0;
+    height: 0;
+    padding: 0 10px;
+    margin-top: 0;
+    border: none;
+}
+#reminder-days-container input[type="number"] {
+    width: 70px;
+}
+
+#user-name {
+    max-width: 400px;
+    margin: 0 auto; 
+    display: block;
+}
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+.schedule-table th, .schedule-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+.schedule-table th { background-color: #f2f2f2; }
+.choice-buttons { display: flex; justify-content: center; gap: 5px; }
+.choice-buttons label { cursor: pointer; }
+.choice-buttons input[type="radio"] { display: none; }
+.choice-buttons span {
+    display: block;
+    width: 35px;
+    height: 35px;
+    line-height: 35px;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    text-align: center;
+    transition: all 0.2s;
+    background-color: #f9f9f9;
+    color: #333;
+}
+.choice-buttons input[type="radio"]:checked + span {
+    background-color: #00B900;
+    color: white;
+    border-color: #00B900;
+    font-weight: bold;
+}
+@media (max-width: 768px) {
+
+    .container {
+        padding: 20px;
+        margin: 10px;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+    h2 {
+        font-size: 1.1em;
+    }
+
+    .preset-container {
+        flex-direction: column; 
+    }
+
+    .schedule-table th, .schedule-table td {
+        padding: 8px;
+        font-size: 0.9em;
+    }
+}
+
+#result-area {
+    margin-top: 30px;
+    padding: 20px;
+    border: 2px dashed #00B900;
+    border-radius: 8px;
+    background-color: #f6fff6;
+    text-align: center;
+}
+
+.url-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-top: 10px;
+}
+
+#result-url {
+    color: #0066cc;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; 
+}
+
+#copy-button {
+    width: auto;
+    padding: 8px 15px;
+    font-size: 0.9em;
+    flex-shrink: 0;
+}

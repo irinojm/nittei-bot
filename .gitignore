@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+
+# 仮想環境 (venv)
+# スクリーンショットにある venv フォルダと設定ファイルを無視します
+venv/
+.venv/
+pyvenv.cfg
+
+# 秘密の合言葉 (.env) ★絶対に公開しない
+.env
+
+# エディタ・OS設定
+.vscode/
+.DS_Store

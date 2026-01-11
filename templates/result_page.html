@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>日程調整 - 集計結果</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <h1>日程調整 集計結果</h1>
+    <p>回答者数：{{ total_members }} 人</p>
+
+    <table class="schedule-table">
+        <thead>
+        <tr>
+            <th>結果</th>
+            <th>◯</th>
+            <th>△</th>
+            <th>✕</th>
+        </tr>
+        </thead>
+     <tbody>
+        {# time_slots リストをループし、インデックス番号 (i) を使って counts にアクセスする #}
+    　{% for i in range(time_slots | length) %}
+        <tr>
+            <td>{{ time_slots[i] }}</td>   {# time_slots の i番目を表示 #}
+            <td>{{ counts[i].ok }}</td>    {# counts の i番目の ok を表示 #}
+            <td>{{ counts[i].maybe }}</td> {# counts の i番目の maybe を表示 #}
+            <td>{{ counts[i].no }}</td>    {# counts の i番目の no を表示 #}
+        </tr>
+    {% endfor %}
+</div>
+</body>
+</html>

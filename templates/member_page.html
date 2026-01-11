@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日程調整 - 回答ページ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div id="event-data-store" data-event='{{ event_info | tojson | safe if event_info else "null" }}' style="display: none;"></div>
+<div class="container">
+    <h1>アカペラ練習 日程調整</h1>
+
+    <form id="answer-form" method="POST" action="">
+        <div class="input-group">
+            <h2>① 名前を入力してください</h2>
+            <input type="text" id="user-name" name="user_name" placeholder="山田太郎" required>
+        </div>
+
+        <div class="input-group">
+            <h2>② 出欠を入力してください</h2>
+            <table class="schedule-table">
+                <thead>
+                <tr>
+                    <th>日付</th>
+                    <th>時間</th>
+                    <th>出欠</th>
+                </tr>
+                </thead>
+                <tbody id="schedule-body"></tbody>
+            </table>
+        </div>
+
+        <button id="submit-button" type="submit">提出する</button>
+    </form>
+</div>
+
+window.onload = function() {
+    // HTMLに隠したデータを取り出す（これでVS Codeは怒りません）
+    const dataStore = document.getElementById('event-data-store');
+    const eventInfo = JSON.parse(dataStore.dataset.event);
+    
+    console.log("Pythonから受け取ったデータ:", eventInfo);
+
+    const form = document.getElementById('answer-form');
+    // URLもJavaScriptの標準的な方法で取得します
+    const pathArray = window.location.pathname.split('/');
+    const eventId = pathArray[pathArray.length - 1];
+    form.action = "/submit/" + eventId;
+
+    if (!eventInfo || eventInfo === "null") {
+        document.getElementById('schedule-body').innerHTML =
+            '<tr><td colspan="3">イベント情報が見つかりません。</td></tr>';
+        return;
+    }
+
+    const tableBody = document.getElementById('schedule-body');
+    let scheduleCounter = 1;
+    let currentDate = new Date(eventInfo.startDate);
+    const endDate = new Date(eventInfo.endDate);
+
+    while (currentDate <= endDate) {
+        const dayOfWeek = currentDate.getDay(); 
+        let startTime, endTime;
+
+        if (dayOfWeek === 0 || dayOfWeek === 6) {
+            startTime = parseInt(eventInfo.holidayStart);
+            endTime = parseInt(eventInfo.holidayEnd);
+        } else {
+            startTime = parseInt(eventInfo.weekdayStart);
+            endTime = parseInt(eventInfo.weekdayEnd);
+        }
+
+        const duration = parseInt(eventInfo.duration);
+
+        for (let hour = startTime; hour < endTime; hour += duration) {
+            const slotStart = hour;
+            const slotEnd = hour + duration;
+            if (slotEnd > endTime) continue;
+
+            if (eventInfo.isExcludeEnabled) {
+                const excludeStart = parseInt(eventInfo.excludeStart);
+                const excludeEnd = parseInt(eventInfo.excludeEnd);
+                if (slotStart < excludeEnd && slotEnd > excludeStart) continue;
+            }
+
+            const formattedDate = (currentDate.getMonth() + 1) + "/" + currentDate.getDate() + " (" + '日月火水木金土'[dayOfWeek] + ")";
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${formattedDate}</td>
+                <td>${slotStart}:00 - ${slotEnd}:00</td>
+                <td>
+                    <div class="choice-buttons">
+                        <label><input type="radio" name="schedule${scheduleCounter}" value="〇" required><span>◯</span></label>
+                        <label><input type="radio" name="schedule${scheduleCounter}" value="△"><span>△</span></label>
+                        <label><input type="radio" name="schedule${scheduleCounter}" value="✕"><span>✕</span></label>
+                    </div>
+                </td>
+            `;
+            tableBody.appendChild(newRow);
+            scheduleCounter++;
+        }
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+};
+</body>
+</html>

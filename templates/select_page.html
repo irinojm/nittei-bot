@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日程調整メーカー</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>日程調整初期設定</h1>
+
+        <div class="input-group">
+            <h2>人数</h2>
+            <input type="number" id="member-count" placeholder="例: 6" min="1"> 人
+        </div>
+
+        <div class="input-group">
+            <h2>期間</h2>
+            <div class="flex-container">
+                <input type="date" id="start-date">
+                <span>から</span>
+                <input type="date" id="end-date">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <h2>候補時間</h2>
+            <p class="description">メンバーの回答画面に表示する時間の候補を設定</p>
+            <div class="preset-container">
+                <div class="preset-box">
+                    <h3>平日</h3>
+                    <div class="inline-inputs">
+                        <select id="weekday-start-hour"></select> 時
+                        <span>～</span>
+                        <select id="weekday-end-hour"></select> 時
+                    </div>
+                </div>
+                <div class="preset-box">
+                    <h3>土日祝</h3>
+                     <div class="inline-inputs">
+                        <select id="holiday-start-hour"></select> 時
+                        <span>～</span>
+                        <select id="holiday-end-hour"></select> 時
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <h2>練習時間</h2>
+            <p class="description">練習時間を設定してください。</p>
+            <select id="duration-select">
+                <option value="1">1時間</option>
+                <option value="2" selected>2時間</option>
+                <option value="3">3時間</option>
+                <option value="4">4時間</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <h2>除外時間（任意）</h2>
+            <p class="description">お昼休憩など候補から外したい時間帯があれば設定してください。</p>
+            <div class="reminder-option">
+                <input type="checkbox" id="exclude-time-checkbox">
+                <label for="exclude-time-checkbox">除外時間を設定する</label>
+            </div>
+            <div id="exclude-time-container" class="hidden">
+                <select id="exclude-start-hour"></select> 時 から
+                <select id="exclude-end-hour"></select> 時 までを除外
+            </div>
+
+        </div> <div class="input-group">
+            <h2>回答の締め切り</h2>
+             <div class="inline-inputs">
+                <input type="date" id="deadline-date">
+                <select id="deadline-hour"></select> 時
+                <select id="deadline-minute"></select> 分
+            </div>
+            <div class="reminder-option">
+                <input type="checkbox" id="reminder-checkbox" name="reminder">
+                <label for="reminder-checkbox">締め切り前にリマインド通知を送る</label>
+            </div>
+            <div id="reminder-days-container" class="hidden">
+                <label for="reminder-days">締め切りの</label>
+                <input type="number" id="reminder-days" min="1" value="1">
+                <label for="reminder-days">日前に通知</label>
+            </div>
+        </div>
+
+        <button id="create-button">回答ページのURLを作成</button>
+
+        <div id="result-area" class="hidden">
+            <h3>作成完了！</h3>
+            <p>以下のURLをコピーしてLINEグループに共有してください。</p>
+            <div class="url-box">
+                <a id="result-url" href="" target="_blank"></a>
+                <button id="copy-button">コピー</button>
+            </div>
+    </div>
+
+    <script>
+        function createHourOptions(selectId) {
+            const select = document.getElementById(selectId);
+            for (let i = 0; i < 24; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                select.appendChild(option);
+            }
+        }
+   
+        function createDeadlineMinuteOptions() {
+            const select = document.getElementById('deadline-minute');
+            const minutes = ['00', '30', '59'];
+            minutes.forEach(min => {
+                const option = document.createElement('option');
+                option.value = min;
+                option.textContent = min;
+                select.appendChild(option);
+            });
+        }
+
+        createHourOptions('weekday-start-hour');
+        createHourOptions('weekday-end-hour');
+        createHourOptions('holiday-start-hour');
+        createHourOptions('holiday-end-hour');
+        createHourOptions('deadline-hour');
+        createDeadlineMinuteOptions();
+
+        const reminderCheckbox = document.getElementById('reminder-checkbox');
+        const reminderDaysContainer = document.getElementById('reminder-days-container');
+
+        reminderCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                reminderDaysContainer.classList.remove('hidden');
+            } else {
+                reminderDaysContainer.classList.add('hidden');
+            }
+        });
+
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('start-date').value = today;
+        document.getElementById('deadline-date').value = today;
+
+        const excludeTimeCheckbox = document.getElementById('exclude-time-checkbox');
+        const excludeTimeContainer = document.getElementById('exclude-time-container');
+        excludeTimeCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                excludeTimeContainer.classList.remove('hidden');
+            } else {
+                excludeTimeContainer.classList.add('hidden');
+            }
+        });
+
+        createHourOptions('exclude-start-hour');
+        createHourOptions('exclude-end-hour');
+
+        const createButton = document.getElementById('create-button');
+
+        createButton.addEventListener('click', function() {
+            const eventData = {
+                startDate: document.getElementById('start-date').value,
+                endDate: document.getElementById('end-date').value,
+                weekdayStart: document.getElementById('weekday-start-hour').value,
+                weekdayEnd: document.getElementById('weekday-end-hour').value,
+                holidayStart: document.getElementById('holiday-start-hour').value,
+                holidayEnd: document.getElementById('holiday-end-hour').value,
+                duration: document.getElementById('duration-select').value,
+                isExcludeEnabled: document.getElementById('exclude-time-checkbox').checked,
+                excludeStart: document.getElementById('exclude-start-hour').value,
+                excludeEnd: document.getElementById('exclude-end-hour').value,
+                deadlineDate: document.getElementById('deadline-date').value,
+                deadlineHour: document.getElementById('deadline-hour').value,
+                deadlineMinute: document.getElementById('deadline-minute').value,
+                needsReminder: document.getElementById('reminder-checkbox').checked,
+                reminderDays: document.getElementById('reminder-days').value,
+                memberCount: document.getElementById('member-count').value
+            };
+            fetch('/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(eventData),
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log('サーバーからの返事:', result);
+                if (result.status === 'success' && result.url) {
+                    const resultArea = document.getElementById('result-area');
+                    const resultUrlLink = document.getElementById('result-url');
+                    const copyButton = document.getElementById('copy-button');
+
+                    resultUrlLink.href = result.url;
+                    resultUrlLink.textContent = result.url;
+                    resultArea.classList.remove('hidden');
+                    copyButton.addEventListener('click', function() {
+                        navigator.clipboard.writeText(result.url).then(function() {
+                            copyButton.textContent = 'コピー完了！';
+                            setTimeout(() => { copyButton.textContent = 'コピー'; }, 2000);
+                        });
+                    });
+
+                } else {
+                    alert('URLの作成に失敗しました。');
+                }
+            })
+            .catch(error => {
+                console.error('エラー:', error);
+                alert('サーバーとの通信に失敗しました。');
+            });
+        });
+    </script>
+</body>
+</html>
